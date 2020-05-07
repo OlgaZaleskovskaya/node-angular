@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-signup',
@@ -8,8 +9,14 @@ import { NgForm } from '@angular/forms';
 })
 export class SignupComponent {
   isLoading = false;
+  constructor(public authService: AuthService) {
 
+  }
   onSignup(f: NgForm) {
-    console.log(f.value);
+    console.log('component', f.value);
+    if (f.invalid) {
+      return;
+    }
+    this.authService.createUser(f.value.email, f.value.password);
   }
 }

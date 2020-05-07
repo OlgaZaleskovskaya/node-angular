@@ -1,28 +1,30 @@
 const express = require("express");
-const bctypt = require("bcrypt");
-const router = express.Router();
+const bcrypt = require("bcrypt");
 const User = require("../models/user");
+const router = express.Router();
+
 
 router.post("/signup", (req, res, next) => {
+  console.log("on server", req.body);
   bcrypt.hash(req.body.password, 10)
-  then(hash => {
-    const user = new User({
-      email: req.body.email,
-      password: hash
-    });
-    user.save()
-    .then(result => {
-      res.status(201).json({
-        message: "User created!",
-        result: result
+    .then(hash => {
+      const user = new User({
+        email: req.body.email,
+        password: hash
       });
-    })
-    .catch(err => {
-      res.status(500).json({
-        error: err
-      });
+      user.save()
+        .then(result => {
+          res.status(201).json({
+            message: "User created!",
+            result: result
+          });
+        })
+        .catch(err => {
+          res.status(500).json({
+            error: err
+          });
+        });
     });
-  });
 });
 
 module.exports = router;
