@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 import { IPost } from "../post.model";
 import { PostsService } from './../posts.service';
 import { PageEvent } from '@angular/material/paginator';
+import { AuthService } from 'src/app/auth/auth.service';
 
 @Component({
   selector: "app-post-list",
@@ -17,31 +18,41 @@ export class PostListComponent implements OnInit, OnDestroy {
   //   { title: "Third Post", content: "This is the third post's content" }
   // ];
   posts: IPost[] = [];
-  private postsSub: Subscription;
   isLoading = true;
   totalPosts = 0;
   postsPerPage = 2;
-  currentPage =1;
+  currentPage = 1;
   pageSizeOptions = [1, 2, 3, 4];
+  userIsAuthenticated = false;
+  userId: string;
+  private postsSub: Subscription;
+  private authStatusSub: Subscription;
 
-  constructor(public postsService: PostsService) { }
+  constructor(public postsService: PostsService, private authService: AuthService) { }
 
   ngOnInit() {
     this.postsService.getPosts(this.postsPerPage, this.currentPage);
+    this.userIsAuthenticated = this.authService.getIsAuthenticated();
+    this.userId = this. authService.getUserId();
     this.postsSub = this.postsService.getPostUpdateListener()
-      .subscribe((postData: {posts: IPost[], postsCount: number}) => {
+      .subscribe((postData: { posts: IPost[], postsCount: number }) => {
         this.isLoading = false;
         this.posts = postData.posts;
         this.totalPosts = postData.postsCount
       });
+    this.authStatusSub = this.authService.getAuthStatusListener()
+      .subscribe(isAuthenticated => {
+        this.userIsAuthenticated = isAuthenticated;
+        this.userId = this.authService.getUserId();
+      })
   }
 
   onDelete(postId: string) {
     this.isLoading = true;
     this.postsService.deletePost(postId)
-    .subscribe(() => {
-      this.postsService.getPosts(this.postsPerPage, this.currentPage);
-    });
+      .subscribe(() => {
+        this.postsService.getPosts(this.postsPerPage, this.currentPage);
+      });
   }
 
   onChangedPage(pageData: PageEvent) {
@@ -54,6 +65,7 @@ export class PostListComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.postsSub.unsubscribe();
+    this.authStatusSub.unsubscribe();
   }
 }
 

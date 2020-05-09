@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 @Injectable({ providedIn: 'root' })
 export class PostsService {
   private posts: IPost[] = [];
-  private postsUpdated = new Subject<{posts: IPost[], postsCount: number}>();
+  private postsUpdated = new Subject<{ posts: IPost[], postsCount: number }>();
 
   constructor(private http: HttpClient, private router: Router) { }
 
@@ -17,26 +17,35 @@ export class PostsService {
     const queryParams = `?pagesize=${postPerPage}&page=${currentPage}`;
     return this.http.get<{ message: string, posts: any, maxPosts: number }>('http://localhost:3000/api/posts' + queryParams)
       .pipe(map((postData) => {
-        return { posts: postData.posts.map(post => {
-          return {
-            title: post.title,
-            content: post.content,
-            id: post._id,
-            imagePath: post.imagePath
-          }
-        }), maxPosts:postData.maxPosts}
+        return {
+          posts: postData.posts.map(post => {
+            return {
+              title: post.title,
+              content: post.content,
+              id: post._id,
+              imagePath: post.imagePath,
+              creator: post.creator
+            }
+          }), maxPosts: postData.maxPosts
+        }
       }))
       .subscribe((transformedPostsData) => {
         this.posts = transformedPostsData.posts;
         this.postsUpdated.next({
           posts: [...this.posts],
-          postsCount:transformedPostsData.maxPosts
+          postsCount: transformedPostsData.maxPosts
         });
       })
   };
 
   getPost(id: string) {
-    return this.http.get<{ _id: string, title: string, content: string, imagePath: string }>(
+    return this.http.get<{
+      _id: string,
+      title: string,
+      content: string,
+      imagePath: string,
+      creator: string
+    }>(
       "http://localhost:3000/api/posts/" + id);
   }
 
@@ -70,7 +79,8 @@ export class PostsService {
         id: id,
         title: title,
         content: content,
-        imagePath: image
+        imagePath: image,
+        creator: null
       }
     };
     this.http.put('http://localhost:3000/api/posts/' + id, postData)

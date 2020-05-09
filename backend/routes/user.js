@@ -30,17 +30,15 @@ router.post("/signup", (req, res, next) => {
 
 router.post("/login", (req, res, next) => {
   let fetchedUser;
-User.findOne({ email: req.body.email})
+  User.findOne({ email: req.body.email })
     .then(user => {
-
       if (!user) {
         return res.status(401).json({
           message: "Auth failed1"
         });
       }
       fetchedUser = user;
-
-     return  bcrypt.compare(req.body.password, user.password);
+      return bcrypt.compare(req.body.password, user.password);
     })
     .then(result => {
       if (!result) {
@@ -54,7 +52,9 @@ User.findOne({ email: req.body.email})
         { expiresIn: "1h" }
       );
       res.status(200).json({
-        token: token
+        token: token,
+        expiresIn: 3600,
+        userId: fetchedUser._id
       });
     })
     .catch(err => {

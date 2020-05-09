@@ -16,6 +16,7 @@ export class LoginComponent {
     if (f.invalid) {
       return;
     }
+    this.isLoading = true;
     this.authService.login(f.value.email, f.value.password);
   }
 
