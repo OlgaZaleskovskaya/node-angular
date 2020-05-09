@@ -34,7 +34,6 @@ router.post(
   checkAuth,
   multer({ storage: storage }).single("image"),
   (req, res, next) => {
-    console.log('user data', req);
     const url = req.protocol + '://' + req.get("host");
     const post = new Post({
       title: req.body.title,
@@ -49,6 +48,10 @@ router.post(
           ...createdPost,
           id: createdPost._id,
         }
+      })
+    }).catch(error => {
+      res.status(500).json({
+        message: "Creating a post failed!"
       })
     });
   });
@@ -79,6 +82,10 @@ router.put(
           res.status(401).json({ message: "Not authorized!" })
         }
 
+      }).catch(error => {
+        res.status(500).json({
+          message: "Updating a post failed!"
+        })
       });
   });
 
@@ -89,7 +96,11 @@ router.get("/:id", (req, res, next) => {
     } else {
       res.status(200).json({ message: 'Post not found' });
     }
-  });
+  }).catch(error => {
+    res.status(500).json({
+      message: "Fetching a post failed!"
+    })
+  });;
 });
 
 router.get("", (req, res, next) => {
@@ -112,7 +123,12 @@ router.get("", (req, res, next) => {
         posts: fetchedPosts,
         maxPosts: count
       })
-    });
+
+      .catch(error => {
+        res.status(500).json({
+          message: "FetcNing posts failed!"
+        })
+      });
 });
 
 router.delete("/:id", checkAuth, (req, res, next) => {
@@ -122,6 +138,10 @@ router.delete("/:id", checkAuth, (req, res, next) => {
     } else {
       res.status(401).json({ message: "Not authorized!" })
     }
+  }).catch(error => {
+    res.status(500).json({
+      message: "Deleting a post failed!"
+    })
   });
 });
 

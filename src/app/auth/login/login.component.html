@@ -2,11 +2,20 @@
 <mat-card>
   <form #loginForm="ngForm" *ngIf="!isLoading" (submit)="onLogin(loginForm)">
     <mat-form-field>
-      <input name="email" ngModel matInput type="email" placeholder="E-Mail" #emailInput="ngModel" required email>
+      <input
+       name="email"
+        ngModel
+         matInput
+          type="email" placeholder="E-Mail" #emailInput="ngModel" required email>
       <mat-error *ngIf="emailInput.invalid">Please enter a valid e-mai.</mat-error>
     </mat-form-field>
     <mat-form-field>
-      <input name="password" ngModel matInput type="password" placeholder="Enter your password" #passwordInput="ngModel"
+      <input
+      name="password"
+       matInput type="password"
+        placeholder="Enter your password"
+         #passwordInput="ngModel"
+         ngModel
         required>
       <mat-error *ngIf="passwordInput.invalid">Please enter your passport.</mat-error>
     </mat-form-field>
